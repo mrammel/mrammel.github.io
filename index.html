@@ -26,21 +26,21 @@
 <body>
     <div id="slideshow"></div>
     <script>
-        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--'; // Deine Google Drive Ordner-ID
-        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68'; // Dein Google API-Schlüssel
-        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink)`;
+        const folderUrl = 'https://redlgmbh-my.sharepoint.com/:f:/g/personal/m_rammel_redl_net/EjfVN24JE-pOjamAQUVpy4cBWgUyB0WJ8twJpdB4L4dg0w?e=camIbX'; // Dein OneDrive-Ordnerlink
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
+        fetch(folderUrl)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const links = [...doc.querySelectorAll('a')];
+                const imageLinks = links.map(link => link.href).filter(href => href.match(/\.(jpg|jpeg|png|gif)$/i));
+
                 const slideshow = document.getElementById('slideshow');
-                console.log(data); // Ausgabe der API-Antwort
-                data.files.forEach(file => {
-                    if (file.mimeType.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = file.thumbnailLink.replace('=s220', '=s1600'); // Größeres Bild
-                        slideshow.appendChild(img);
-                    }
+                imageLinks.forEach(src => {
+                    const img = document.createElement('img');
+                    img.src = src;
+                    slideshow.appendChild(img);
                 });
                 startSlideshow();
             });
