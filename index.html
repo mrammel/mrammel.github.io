@@ -28,7 +28,7 @@
     <script>
         const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--';
         const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68';
-        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,webContentLink)`;
+        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,webContentLink,thumbnailLink)`;
 
         fetch(url)
             .then(response => response.json())
@@ -38,11 +38,15 @@
                     if (file.mimeType.startsWith('image/')) {
                         const img = document.createElement('img');
                         img.src = `https://drive.google.com/uc?export=view&id=${file.id}`;
+                        img.onerror = () => {
+                            img.src = file.thumbnailLink;
+                        };
                         slideshow.appendChild(img);
                     }
                 });
                 startSlideshow();
-            });
+            })
+            .catch(error => console.error('Error fetching data:', error));
 
         function startSlideshow() {
             let currentIndex = 0;
