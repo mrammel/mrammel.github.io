@@ -26,8 +26,8 @@
 <body>
     <div id="slideshow"></div>
     <script>
-        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--'; // Ersetze durch deine Google Drive Ordner-ID
-        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68'; // Ersetze durch deinen Google API-Schlüssel
+        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--'; // Deine Google Drive Ordner-ID
+        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68'; // Dein Google API-Schlüssel
         const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,webViewLink)`;
 
         fetch(url)
@@ -53,7 +53,7 @@
                     images[currentIndex].classList.remove('active');
                     currentIndex = (currentIndex + 1) % images.length;
                     images[currentIndex].classList.add('active');
-                }, 5000); // Ändert das Bild alle 5 Sekunden
+                }, 5000); // Bildwechsel alle 5 Sekunden
             }
         }
     </script>
