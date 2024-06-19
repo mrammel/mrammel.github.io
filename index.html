@@ -1,7 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneDrive Slideshow</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #000;
+        }
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+        img.active {
+            display: block;
+        }
+    </style>
+</head>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+    <div id="slideshow"></div>
+    <script>
+        const folderUrl = 'https://redlgmbh-my.sharepoint.com/:f:/g/personal/m_rammel_redl_net/EjfVN24JE-pOjamAQUVpy4cBWgUyB0WJ8twJpdB4L4dg0w?e=wUa4ks';
+
+        fetch(folderUrl)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const imageLinks = Array.from(doc.querySelectorAll('a')).filter(a => a.href.endsWith('.jpg') || a.href.endsWith('.png') || a.href.endsWith('.jpeg'));
+
+                const slideshow = document.getElementById('slideshow');
+                imageLinks.forEach(link => {
+                    const img = document.createElement('img');
+                    img.src = link.href;
+                    slideshow.appendChild(img);
+                });
+                startSlideshow();
+            });
+
+        function startSlideshow() {
+            let currentIndex = 0;
+            const images = document.querySelectorAll('#slideshow img');
+            if (images.length > 0) {
+                images[currentIndex].classList.add('active');
+                setInterval(() => {
+                    images[currentIndex].classList.remove('active');
+                    currentIndex = (currentIndex + 1) % images.length;
+                    images[currentIndex].classList.add('active');
+                }, 5000); // Change image every 5 seconds
+            }
+        }
+    </script>
 </body>
 </html>
