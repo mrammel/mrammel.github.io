@@ -13,13 +13,26 @@
             margin: 0;
             background: #000;
         }
-        img {
+        #slideshow {
+            width: 1536px;
+            height: 864px;
+            position: relative;
+            background: #000;
+        }
+        img, video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             max-width: 100%;
             max-height: 100%;
             display: none;
         }
-        img.active {
+        img.active, video.active {
             display: block;
+        }
+        video {
+            background: #000;
         }
     </style>
 </head>
@@ -34,27 +47,46 @@
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 const links = [...doc.querySelectorAll('a')];
-                const imageLinks = links.map(link => link.href).filter(href => href.match(/\.(jpg|jpeg|png|gif)$/i));
+                const mediaLinks = links.map(link => link.href).filter(href => href.match(/\.(jpg|jpeg|png|gif|mp4|webm|ogg)$/i));
 
                 const slideshow = document.getElementById('slideshow');
-                imageLinks.forEach(src => {
-                    const img = document.createElement('img');
-                    img.src = src;
-                    slideshow.appendChild(img);
+                mediaLinks.forEach(src => {
+                    if (src.match(/\.(jpg|jpeg|png|gif)$/i)) {
+                        const img = document.createElement('img');
+                        img.src = src;
+                        slideshow.appendChild(img);
+                    } else if (src.match(/\.(mp4|webm|ogg)$/i)) {
+                        const video = document.createElement('video');
+                        video.src = src;
+                        video.controls = false;
+                        video.autoplay = false;
+                        video.loop = true;
+                        slideshow.appendChild(video);
+                    }
                 });
                 startSlideshow();
             });
 
         function startSlideshow() {
             let currentIndex = 0;
-            const images = document.querySelectorAll('#slideshow img');
-            if (images.length > 0) {
-                images[currentIndex].classList.add('active');
+            const media = document.querySelectorAll('#slideshow img, #slideshow video');
+            if (media.length > 0) {
+                media[currentIndex].classList.add('active');
+                if (media[currentIndex].tagName === 'VIDEO') {
+                    media[currentIndex].play();
+                }
                 setInterval(() => {
-                    images[currentIndex].classList.remove('active');
-                    currentIndex = (currentIndex + 1) % images.length;
-                    images[currentIndex].classList.add('active');
-                }, 5000); // Bildwechsel alle 5 Sekunden
+                    media[currentIndex].classList.remove('active');
+                    if (media[currentIndex].tagName === 'VIDEO') {
+                        media[currentIndex].pause();
+                        media[currentIndex].currentTime = 0;
+                    }
+                    currentIndex = (currentIndex + 1) % media.length;
+                    media[currentIndex].classList.add('active');
+                    if (media[currentIndex].tagName === 'VIDEO') {
+                        media[currentIndex].play();
+                    }
+                }, 5000); // Wechsel alle 5 Sekunden, anpassbar
             }
         }
     </script>
