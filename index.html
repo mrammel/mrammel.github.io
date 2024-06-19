@@ -26,23 +26,18 @@
 <body>
     <div id="slideshow"></div>
     <script>
-        const folderUrl = 'https://redlgmbh-my.sharepoint.com/:f:/g/personal/m_rammel_redl_net/EjfVN24JE-pOjamAQUVpy4cBWgUyB0WJ8twJpdB4L4dg0w?e=wUa4ks';
+        const imageUrls = [
+            'https://redlgmbh-my.sharepoint.com/:i:/g/personal/m_rammel_redl_net/ETT5fuRjuTJGhELUg5IWi2wBNTEXVSfSFJt2xcil5rSv_g?e=haVqZo',
+            'https://redlgmbh-my.sharepoint.com/:v:/g/personal/m_rammel_redl_net/EVpM_2USjAtIm4BHFxMnswsBQdyUFH-bf8PycaTEfoQp3w?e=GC9tWO&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D',
+            'https://redlgmbh-my.sharepoint.com/:i:/g/personal/m_rammel_redl_net/EWW3_sA4GhZMvv9DbAA-BXUBGzUUUMTEOdsjroyquciyxA?e=6PeNnl'
+        ];
 
-        fetch(folderUrl)
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const imageLinks = Array.from(doc.querySelectorAll('a')).filter(a => a.href.endsWith('.jpg') || a.href.endsWith('.png') || a.href.endsWith('.jpeg'));
-
-                const slideshow = document.getElementById('slideshow');
-                imageLinks.forEach(link => {
-                    const img = document.createElement('img');
-                    img.src = link.href;
-                    slideshow.appendChild(img);
-                });
-                startSlideshow();
-            });
+        const slideshow = document.getElementById('slideshow');
+        imageUrls.forEach(url => {
+            const img = document.createElement('img');
+            img.src = url;
+            slideshow.appendChild(img);
+        });
 
         function startSlideshow() {
             let currentIndex = 0;
@@ -56,6 +51,8 @@
                 }, 5000); // Change image every 5 seconds
             }
         }
+
+        startSlideshow();
     </script>
 </body>
 </html>
