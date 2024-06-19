@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OneDrive Slideshow</title>
+    <title>Slideshow</title>
     <style>
         body {
             display: flex;
@@ -26,18 +26,23 @@
 <body>
     <div id="slideshow"></div>
     <script>
-        const imageUrls = [
-            'https://redlgmbh-my.sharepoint.com/personal/m_rammel_redl_net/ETT5fuRjuTJGhELUg5IWi2wBLyNIi_6emTCd1YW3jRtzRw?e=R0ywaB',
-            'https://redlgmbh-my.sharepoint.com/personal/m_rammel_redl_net/EVpM_2USjAtIm4BHFxMnswsBUd1OszCMzzQqCoZd9lnsvQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=RkMnF3',
-            'https://redlgmbh-my.sharepoint.com/personal/m_rammel_redl_net/EWW3_sA4GhZMvv9DbAA-BXUBSKNrKeQNoxySt72cUFUqgA?e=MYmh6s'
-        ];
+        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--'; // Ersetze durch deine Google Drive Ordner-ID
+        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68'; // Ersetze durch deinen Google API-Schlüssel
+        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,webViewLink)`;
 
-        const slideshow = document.getElementById('slideshow');
-        imageUrls.forEach(url => {
-            const img = document.createElement('img');
-            img.src = url;
-            slideshow.appendChild(img);
-        });
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const slideshow = document.getElementById('slideshow');
+                data.files.forEach(file => {
+                    if (file.mimeType.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = `https://drive.google.com/uc?export=view&id=${file.id}`;
+                        slideshow.appendChild(img);
+                    }
+                });
+                startSlideshow();
+            });
 
         function startSlideshow() {
             let currentIndex = 0;
@@ -48,11 +53,9 @@
                     images[currentIndex].classList.remove('active');
                     currentIndex = (currentIndex + 1) % images.length;
                     images[currentIndex].classList.add('active');
-                }, 5000); // Change image every 5 seconds
+                }, 5000); // Ändert das Bild alle 5 Sekunden
             }
         }
-
-        startSlideshow();
     </script>
 </body>
 </html>
