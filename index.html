@@ -30,6 +30,9 @@
             font-size: 24px;
             position: absolute;
             z-index: 2;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         img {
             width: 100%;
@@ -54,10 +57,18 @@
         <div id="slideshow"></div>
     </div>
     <script>
+        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68';
+
         async function fetchImages() {
             try {
+                console.log('Fetching images...');
                 const response = await fetch('http://localhost:3000/images');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const data = await response.json();
+                console.log('Images fetched:', data);
+
                 const slideshow = document.getElementById('slideshow');
                 const loading = document.getElementById('loading');
                 loading.style.display = 'none';
@@ -65,9 +76,10 @@
                 slideshow.innerHTML = ''; // Clear existing images
 
                 data.files.forEach(file => {
-                    if (file.mimeType.startsWith('image/')) {
+                    if (file.mimeType.startsWith('image/')) { // Only process images
                         const img = document.createElement('img');
                         img.src = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&key=${apiKey}`;
+                        img.onerror = () => console.error('Error loading image:', img.src);
                         slideshow.appendChild(img);
                     }
                 });
