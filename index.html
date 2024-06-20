@@ -13,37 +13,56 @@
             margin: 0;
             background: #000;
         }
+        #loading {
+            color: white;
+            font-size: 24px;
+        }
         img {
             max-width: 100%;
             max-height: 100%;
             display: none;
+            transition: opacity 1s ease-in-out;
+            opacity: 0;
         }
         img.active {
             display: block;
+            opacity: 1;
         }
     </style>
 </head>
 <body>
-    <div id="slideshow"></div>
+    <div id="loading">Loading...</div>
+    <div id="slideshow" style="display: none;"></div>
     <script>
         const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--';
         const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68';
         const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink)`;
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                const slideshow = document.getElementById('slideshow');
-                data.files.forEach(file => {
-                    if (file.mimeType.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&key=${apiKey}`;
-                        slideshow.appendChild(img);
-                    }
+        function fetchImages() {
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const slideshow = document.getElementById('slideshow');
+                    const loading = document.getElementById('loading');
+                    loading.style.display = 'none';
+                    slideshow.style.display = 'flex';
+                    slideshow.innerHTML = ''; // Clear existing images
+
+                    data.files.forEach(file => {
+                        if (file.mimeType.startsWith('image/')) {
+                            const img = document.createElement('img');
+                            img.src = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&key=${apiKey}`;
+                            slideshow.appendChild(img);
+                        }
+                    });
+                    startSlideshow();
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    const loading = document.getElementById('loading');
+                    loading.innerHTML = 'Failed to load images.';
                 });
-                startSlideshow();
-            })
-            .catch(error => console.error('Error fetching data:', error));
+        }
 
         function startSlideshow() {
             let currentIndex = 0;
@@ -54,9 +73,15 @@
                     images[currentIndex].classList.remove('active');
                     currentIndex = (currentIndex + 1) % images.length;
                     images[currentIndex].classList.add('active');
-                }, 5000); // Change image every 5 seconds
+                }, 8000); // Change image every 8 seconds
             }
         }
+
+        // Initial load of images
+        fetchImages();
+
+        // Refresh images every 60 seconds
+        setInterval(fetchImages, 60000); // Update images every 60 seconds
     </script>
 </body>
 </html>
