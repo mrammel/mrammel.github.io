@@ -12,7 +12,7 @@
     <script>
         const img = document.getElementById('test-image');
         img.onload = () => console.log('Image loaded successfully');
-        img.onerror = (e) => console.error('Error loading image:', e);
+        img.onerror = (e) => console.error('Error loading image:', img.src, e);
     </script>
 </body>
 </html>
