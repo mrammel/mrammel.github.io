@@ -30,6 +30,8 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            background-size: cover;
+            background-position: center;
         }
         #container {
             position: relative;
@@ -67,6 +69,10 @@
         }
         img.active {
             opacity: 1;
+            z-index: 2;
+        }
+        img.fadeout {
+            opacity: 0;
             z-index: 2;
         }
         #frame {
@@ -125,12 +131,19 @@
                 slideshow.style.display = 'block';
                 slideshow.innerHTML = ''; // Clear existing images
 
+                let firstImageSrc = '';
                 data.files.forEach((file, index) => {
                     if (file.mimeType.startsWith('image/')) {
                         const img = document.createElement('img');
                         img.src = file.thumbnailLink.replace(/=s220$/, '=s1536'); // Scale thumbnail to appropriate size
                         img.alt = file.name;
-                        img.onload = () => console.log(`Image loaded: ${img.src}`);
+                        img.onload = () => {
+                            console.log(`Image loaded: ${img.src}`);
+                            if (index === 0) {
+                                firstImageSrc = img.src;
+                                document.getElementById('inner-frame').style.backgroundImage = `url(${firstImageSrc})`;
+                            }
+                        };
                         img.onerror = (e) => {
                             console.error('Error loading image:', img.src, e);
                             img.remove();
@@ -162,8 +175,9 @@
 
                     // Sonderbehandlung für den Übergang vom letzten zum ersten Bild
                     if (currentIndex === 0) {
+                        images[images.length - 1].classList.add('fadeout');
                         setTimeout(() => {
-                            images[images.length - 1].classList.remove('active');
+                            images[images.length - 1].classList.remove('fadeout');
                         }, 2000); // Nach der Übergangszeit entfernen
                     }
                 }, 12000); // Change image every 12 seconds
