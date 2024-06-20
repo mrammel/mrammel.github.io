@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slideshow with Frame</title>
     <style>
@@ -25,7 +25,7 @@
             top: 0;
             left: 0;
             z-index: 1;
-            overflow: hidden;
+            overflow: hidden; /* Hide any overflowing content */
         }
         #loading {
             color: white;
@@ -39,7 +39,7 @@
         img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: cover; /* Ensures the image scales to fill the area */
             position: absolute;
             top: 0;
             left: 0;
@@ -57,7 +57,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            pointer-events: none;
+            pointer-events: none; /* Ensures the frame does not interfere with slideshow interaction */
             z-index: 3;
         }
     </style>
@@ -71,36 +71,34 @@
     <script>
         const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--';
         const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68';
-        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType)`;
+        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink)`;
 
-        async function fetchImages() {
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                const slideshow = document.getElementById('slideshow');
-                const loading = document.getElementById('loading');
-                loading.style.display = 'none';
-                slideshow.style.display = 'block';
-                slideshow.innerHTML = ''; // Clear existing images
+        function fetchImages() {
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const slideshow = document.getElementById('slideshow');
+                    const loading = document.getElementById('loading');
+                    loading.style.display = 'none';
+                    slideshow.style.display = 'block';
+                    slideshow.innerHTML = ''; // Clear existing images
 
-                data.files.forEach(file => {
-                    if (file.mimeType.startsWith('image/')) {
-                        if (file.name !== 'rahmen.png') { // Exclude 'rahmen.png' from slideshow
-                            const img = document.createElement('img');
-                            img.src = `https://drive.google.com/uc?export=view&id=${file.id}`;
-                            img.style.display = 'none'; // Initially hide the image
-                            img.onload = () => { img.style.display = 'block'; }; // Show image when loaded
-                            img.onerror = () => { console.error('Image not loaded'); };
-                            slideshow.appendChild(img);
+                    data.files.forEach(file => {
+                        if (file.mimeType.startsWith('image/')) {
+                            if (file.name !== 'rahmen.png') { // Exclude 'rahmen.png' from slideshow
+                                const img = document.createElement('img');
+                                img.src = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&key=${apiKey}`;
+                                slideshow.appendChild(img);
+                            }
                         }
-                    }
+                    });
+                    startSlideshow();
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    const loading = document.getElementById('loading');
+                    loading.innerHTML = 'Failed to load images.';
                 });
-                startSlideshow();
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                const loading = document.getElementById('loading');
-                loading.innerHTML = 'Failed to load images.';
-            }
         }
 
         function startSlideshow() {
