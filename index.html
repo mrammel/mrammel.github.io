@@ -13,16 +13,23 @@
             margin: 0;
             background: #000;
         }
+        #container {
+            position: relative;
+            width: 1536px;
+            height: 864px;
+        }
         #slideshow {
-            width: 1536px; /* Set the width of the slideshow area */
-            height: 864px; /* Set the height of the slideshow area */
-            display: none;
+            width: 100%;
+            height: 100%;
             position: relative;
             overflow: hidden; /* Hide any overflowing content */
+            z-index: 1;
         }
         #loading {
             color: white;
             font-size: 24px;
+            position: absolute;
+            z-index: 2;
         }
         img {
             width: 100%;
@@ -43,7 +50,9 @@
 </head>
 <body>
     <div id="loading">Loading...</div>
-    <div id="slideshow"></div>
+    <div id="container">
+        <div id="slideshow"></div>
+    </div>
     <script>
         const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--';
         const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68';
