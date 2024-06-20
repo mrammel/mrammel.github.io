@@ -170,12 +170,21 @@
                     currentIndex = nextIndex;
                     nextIndex = (nextIndex + 1) % images.length;
 
-                    images[previousIndex].classList.add('fadeout');
-                    images[currentIndex].classList.add('active');
+                    if (currentIndex === 0) {
+                        images[previousIndex].classList.add('fadeout');
+                        images[currentIndex].classList.add('active');
 
-                    setTimeout(() => {
-                        images[previousIndex].classList.remove('active', 'fadeout');
-                    }, fadeDuration);
+                        setTimeout(() => {
+                            images[previousIndex].classList.remove('active', 'fadeout');
+                        }, fadeDuration);
+                    } else {
+                        images[previousIndex].classList.add('fadeout');
+                        images[currentIndex].classList.add('active');
+
+                        setTimeout(() => {
+                            images[previousIndex].classList.remove('active', 'fadeout');
+                        }, fadeDuration);
+                    }
                 };
 
                 setInterval(fadeOutAndShowNext, displayDuration + fadeDuration); // Change image every 8 seconds including fade in/out duration
