@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slideshow with Slow Crossfade Transition</title>
+    <title>Slideshow with Smooth Crossfade</title>
     <style>
         body {
             display: flex;
@@ -62,13 +62,16 @@
             position: absolute;
             top: 0;
             left: 0;
-            display: none;
-            transition: opacity 2s ease-in-out;
             opacity: 0;
+            transition: opacity 2s ease-in-out;
         }
         img.active {
-            display: block;
             opacity: 1;
+            z-index: 2;
+        }
+        img.previous {
+            opacity: 0;
+            z-index: 1;
         }
         #frame {
             width: 100%;
@@ -152,10 +155,18 @@
             const images = document.querySelectorAll('#slideshow img');
             if (images.length > 0) {
                 images[currentIndex].classList.add('active');
+
                 setInterval(() => {
-                    images[currentIndex].classList.remove('active');
+                    const previousIndex = currentIndex;
+                    images[previousIndex].classList.remove('active');
+                    images[previousIndex].classList.add('previous');
+
                     currentIndex = (currentIndex + 1) % images.length;
                     images[currentIndex].classList.add('active');
+
+                    setTimeout(() => {
+                        images[previousIndex].classList.remove('previous');
+                    }, 2000); // Remove previous class after fade out
                 }, 12000); // Change image every 12 seconds
             }
         }
