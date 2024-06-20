@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seamless Slideshow</title>
+    <title>Slideshow with Seamless Transition</title>
     <style>
         body {
             display: flex;
@@ -38,23 +38,42 @@
             background-color: #000;
             background-size: cover;
             background-position: center;
-            overflow: hidden;
         }
         #slideshow {
-            display: flex;
             width: 100%;
             height: 100%;
-            animation: slide 24s infinite;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
-        @keyframes slide {
-            0% { transform: translateX(0); }
-            33.33% { transform: translateX(-100%); }
-            66.66% { transform: translateX(-200%); }
-            100% { transform: translateX(0); }
+        #loading {
+            color: white;
+            font-size: 24px;
+            position: absolute;
+            z-index: 2;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
-        .slide {
-            min-width: 100%;
-            transition: opacity 1s ease-in-out;
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+        img.active {
+            opacity: 1;
+            z-index: 2;
+        }
+        img.fadeout {
+            opacity: 0 !important;
+            z-index: 1;
+            transition: opacity 2s ease-in-out;
         }
         #frame {
             width: 100%;
@@ -77,15 +96,6 @@
                         inset 0 0 5px 5px rgba(0, 0, 0, 0.15),
                         inset 0 0 5px 5px rgba(0, 0, 0, 0.1),
                         inset 0 0 5px 5px rgba(0, 0, 0, 0.05);
-        }
-        #loading {
-            color: white;
-            font-size: 24px;
-            position: absolute;
-            z-index: 2;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
         }
     </style>
 </head>
@@ -113,7 +123,7 @@
                 const slideshow = document.getElementById('slideshow');
                 const loading = document.getElementById('loading');
                 loading.style.display = 'none';
-                slideshow.style.display = 'flex';
+                slideshow.style.display = 'block';
                 slideshow.innerHTML = '';
 
                 data.files.forEach((file, index) => {
@@ -121,7 +131,6 @@
                         const img = document.createElement('img');
                         img.src = file.thumbnailLink.replace(/=s220$/, '=s1536');
                         img.alt = file.name;
-                        img.classList.add('slide');
                         img.onload = () => console.log(`Image loaded: ${img.src}`);
                         img.onerror = e => {
                             console.error('Error loading image:', img.src, e);
@@ -133,11 +142,48 @@
 
                 // Kopiere das erste Bild an das Ende der Slideshow
                 const firstImageClone = slideshow.firstChild.cloneNode(true);
+                firstImageClone.classList.add('clone');
                 slideshow.appendChild(firstImageClone);
 
+                startSlideshow();
             } catch (error) {
                 console.error('Error fetching data:', error);
                 document.getElementById('loading').innerHTML = 'Failed to load images.';
+            }
+        }
+
+        function startSlideshow() {
+            let currentIndex = 0;
+            const images = document.querySelectorAll('#slideshow img');
+            const fadeDuration = 2000; // 2 seconds for fade in/out
+            const displayDuration = 6000; // 6 seconds for display
+            const clonedIndex = images.length - 1;
+
+            if (images.length > 0) {
+                images[currentIndex].classList.add('active');
+
+                const fadeOutAndShowNext = () => {
+                    const previousIndex = currentIndex;
+                    currentIndex = (currentIndex + 1) % images.length;
+
+                    images[previousIndex].classList.add('fadeout');
+                    images[currentIndex].classList.add('active');
+
+                    setTimeout(() => {
+                        images[previousIndex].classList.remove('active', 'fadeout');
+
+                        // Wenn das nächste Bild das geklonte erste Bild ist (am Ende der Slideshow)
+                        if (currentIndex === clonedIndex) {
+                            setTimeout(() => {
+                                images[currentIndex].classList.remove('active');
+                                currentIndex = 0;
+                                images[currentIndex].classList.add('active');
+                            }, 1000); // Zeige das geklonte Bild für 1 Sekunde
+                        }
+                    }, fadeDuration);
+                };
+
+                setInterval(fadeOutAndShowNext, displayDuration + fadeDuration);
             }
         }
 
