@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slideshow with Crossfade Transition</title>
+    <title>Slideshow with Slow Crossfade Transition</title>
     <style>
         body {
             display: flex;
@@ -63,7 +63,7 @@
             top: 0;
             left: 0;
             display: none;
-            transition: opacity 1s ease-in-out;
+            transition: opacity 2s ease-in-out;
             opacity: 0;
         }
         img.active {
@@ -156,7 +156,7 @@
                     images[currentIndex].classList.remove('active');
                     currentIndex = (currentIndex + 1) % images.length;
                     images[currentIndex].classList.add('active');
-                }, 8000); // Change image every 8 seconds
+                }, 12000); // Change image every 12 seconds
             }
         }
 
