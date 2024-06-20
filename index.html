@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slideshow with Double Frame and Shadow</title>
+    <title>Slideshow with OneDrive Links</title>
     <style>
         body {
             display: flex;
@@ -17,15 +17,15 @@
             position: relative;
             width: 1920px;
             height: 1080px;
-            background-color: #131919; /* Äußerer Rahmen */
+            background-color: #131919;
             display: flex;
             justify-content: center;
             align-items: center;
         }
         #inner-frame {
-            width: calc(1920px - 2 * 37px); /* Berechnet die Breite des inneren Rahmens */
-            height: calc(1080px - 2 * 37px); /* Berechnet die Höhe des inneren Rahmens */
-            background-color: #ebe7dc; /* Innerer Rahmen */
+            width: calc(1920px - 2 * 37px);
+            height: calc(1080px - 2 * 37px);
+            background-color: #ebe7dc;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -35,7 +35,7 @@
             position: relative;
             width: 1536px;
             height: 864px;
-            background-color: #000; /* Hintergrundfarbe des Containers */
+            background-color: #000;
         }
         #slideshow {
             width: 100%;
@@ -44,7 +44,7 @@
             top: 0;
             left: 0;
             z-index: 1;
-            overflow: hidden; /* Hide any overflowing content */
+            overflow: hidden;
         }
         #loading {
             color: white;
@@ -58,7 +58,7 @@
         img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Ensures the image scales to fill the area */
+            object-fit: cover;
             position: absolute;
             top: 0;
             left: 0;
@@ -76,7 +76,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            pointer-events: none; /* Ensures the frame does not interfere with slideshow interaction */
+            pointer-events: none;
             z-index: 3;
         }
         #shadow-frame {
@@ -106,45 +106,38 @@
         </div>
     </div>
     <script>
-        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--'; // Ersetzen Sie dies durch Ihre Google Drive Folder ID
-        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68'; // Ersetzen Sie dies durch Ihren Google Drive API Key
-        const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink)`;
+        const publicFolderLink = 'https://redlgmbh-my.sharepoint.com/:f:/g/personal/m_rammel_redl_net/EjfVN24JE-pOjamAQUVpy4cBM8COg3h2nZoZWd15TGh51Q?e=mZ486X';
 
-        async function fetchImages() {
-            try {
-                console.log('Fetching images...');
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                console.log('Images fetched:', data);
+        async function fetchPublicFolderContents() {
+            const response = await fetch(publicFolderLink);
+            const text = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+            const items = doc.querySelectorAll('a[aria-label][href*="/personal/m_rammel_redl_net/"]');
+            const links = Array.from(items).map(item => item.href);
+            return links;
+        }
 
-                const slideshow = document.getElementById('slideshow');
-                const loading = document.getElementById('loading');
-                loading.style.display = 'none';
-                slideshow.style.display = 'block';
-                slideshow.innerHTML = ''; // Clear existing images
+        async function displayImages() {
+            const links = await fetchPublicFolderContents();
+            const slideshow = document.getElementById('slideshow');
+            const loading = document.getElementById('loading');
+            loading.style.display = 'none';
+            slideshow.style.display = 'block';
 
-                data.files.forEach(file => {
-                    if (file.mimeType.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = file.thumbnailLink.replace(/=s220$/, '=s1536'); // Scale thumbnail to appropriate size
-                        img.alt = file.name;
-                        img.onload = () => console.log(`Image loaded: ${img.src}`);
-                        img.onerror = (e) => {
-                            console.error('Error loading image:', img.src, e);
-                            img.remove();
-                        };
-                        slideshow.appendChild(img);
-                    }
-                });
-                startSlideshow();
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                const loading = document.getElementById('loading');
-                loading.innerHTML = 'Failed to load images.';
-            }
+            links.forEach(link => {
+                const img = document.createElement('img');
+                img.src = link.replace("?e=mZ486X", "?download=1");
+                img.alt = 'Slideshow Image';
+                img.onload = () => console.log(`Image loaded: ${img.src}`);
+                img.onerror = (e) => {
+                    console.error('Error loading image:', img.src, e);
+                    img.remove();
+                };
+                slideshow.appendChild(img);
+            });
+
+            startSlideshow();
         }
 
         function startSlideshow() {
@@ -156,17 +149,12 @@
                     images[currentIndex].classList.remove('active');
                     currentIndex = (currentIndex + 1) % images.length;
                     images[currentIndex].classList.add('active');
-                }, 8000); // Change image every 8 seconds
+                }, 8000);
             }
         }
 
-        // Initial load of images
-        fetchImages();
+        displayImages();
 
-        // Refresh images every 60 seconds
-        setInterval(fetchImages, 60000); // Update images every 60 seconds
-
-        // Additional error handling for asynchronous issues
         window.addEventListener('error', (e) => {
             console.error('Global error handler:', e.message, e.filename, e.lineno, e.colno, e.error);
         });
