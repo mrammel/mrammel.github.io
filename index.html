@@ -13,10 +13,28 @@
             margin: 0;
             background: #000;
         }
+        #outer-frame {
+            position: relative;
+            width: 1920px;
+            height: 1080px;
+            background-color: #131919; /* Äußerer Rahmen */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #inner-frame {
+            width: calc(1920px - 2 * 37px); /* Berechnet die Breite des inneren Rahmens */
+            height: calc(1080px - 2 * 37px); /* Berechnet die Höhe des inneren Rahmens */
+            background-color: #ebe7dc; /* Innerer Rahmen */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
         #container {
             position: relative;
             width: 1536px;
             height: 864px;
+            background-color: #000; /* Hintergrundfarbe des Containers */
         }
         #slideshow {
             width: 100%;
@@ -63,14 +81,18 @@
     </style>
 </head>
 <body>
-    <div id="container">
-        <div id="slideshow"></div>
-        <img id="frame" src="rahmen.png" alt="Frame" />
-        <div id="loading">Loading...</div>
+    <div id="outer-frame">
+        <div id="inner-frame">
+            <div id="container">
+                <div id="slideshow"></div>
+                <img id="frame" src="rahmen.png" alt="Frame" />
+                <div id="loading">Loading...</div>
+            </div>
+        </div>
     </div>
     <script>
-        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--';
-        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68';
+        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--'; // Ersetzen Sie dies durch Ihre Google Drive Folder ID
+        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68'; // Ersetzen Sie dies durch Ihren Google Drive API Key
         const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink)`;
 
         async function fetchImages() {
