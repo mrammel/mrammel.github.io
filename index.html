@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slideshow with Seamless Transition</title>
+    <title>Slideshow with Smooth Crossfade Transition</title>
     <style>
         body {
             display: flex;
@@ -69,10 +69,6 @@
             opacity: 1;
             z-index: 2;
         }
-        img.previous {
-            opacity: 0;
-            z-index: 1;
-        }
         #frame {
             width: 100%;
             height: 100%;
@@ -129,7 +125,6 @@
                 slideshow.style.display = 'block';
                 slideshow.innerHTML = ''; // Clear existing images
 
-                let firstImageSrc = '';
                 data.files.forEach((file, index) => {
                     if (file.mimeType.startsWith('image/')) {
                         const img = document.createElement('img');
@@ -141,25 +136,8 @@
                             img.remove();
                         };
                         slideshow.appendChild(img);
-
-                        if (index === 0) {
-                            firstImageSrc = img.src;
-                        }
                     }
                 });
-
-                // Add the first image again at the end for a seamless transition
-                if (firstImageSrc) {
-                    const img = document.createElement('img');
-                    img.src = firstImageSrc;
-                    img.alt = 'First Image Clone';
-                    img.onload = () => console.log(`Image loaded: ${img.src}`);
-                    img.onerror = (e) => {
-                        console.error('Error loading image:', img.src, e);
-                        img.remove();
-                    };
-                    slideshow.appendChild(img);
-                }
 
                 startSlideshow();
             } catch (error) {
@@ -172,17 +150,23 @@
         function startSlideshow() {
             let currentIndex = 0;
             const images = document.querySelectorAll('#slideshow img');
-            const imageCount = images.length;
-            const displayDuration = 6000; // 6 seconds per image
-
-            if (imageCount > 0) {
+            if (images.length > 0) {
                 images[currentIndex].classList.add('active');
 
                 setInterval(() => {
-                    images[currentIndex].classList.remove('active');
-                    currentIndex = (currentIndex + 1) % imageCount;
+                    const previousIndex = currentIndex;
+                    currentIndex = (currentIndex + 1) % images.length;
+
+                    images[previousIndex].classList.remove('active');
                     images[currentIndex].classList.add('active');
-                }, displayDuration); // Change image every 6 seconds
+
+                    // Sonderbehandlung für den Übergang vom letzten zum ersten Bild
+                    if (currentIndex === 0) {
+                        setTimeout(() => {
+                            images[images.length - 1].classList.remove('active');
+                        }, 2000); // Nach der Übergangszeit entfernen
+                    }
+                }, 12000); // Change image every 12 seconds
             }
         }
 
