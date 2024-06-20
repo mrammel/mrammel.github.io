@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slideshow with Smooth Crossfade Transition</title>
+    <title>Slideshow with Seamless Transition</title>
     <style>
         body {
             display: flex;
@@ -30,14 +30,14 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            background-size: cover;
-            background-position: center;
         }
         #container {
             position: relative;
             width: 1536px;
             height: 864px;
             background-color: #000;
+            background-size: cover;
+            background-position: center;
         }
         #slideshow {
             width: 100%;
@@ -141,7 +141,7 @@
                             console.log(`Image loaded: ${img.src}`);
                             if (index === 0) {
                                 firstImageSrc = img.src;
-                                document.getElementById('inner-frame').style.backgroundImage = `url(${firstImageSrc})`;
+                                document.getElementById('container').style.backgroundImage = `url(${firstImageSrc})`;
                             }
                         };
                         img.onerror = (e) => {
@@ -180,7 +180,7 @@
                             images[images.length - 1].classList.remove('fadeout');
                         }, 2000); // Nach der Übergangszeit entfernen
                     }
-                }, 12000); // Change image every 12 seconds
+                }, 8000); // Change image every 8 seconds
             }
         }
 
