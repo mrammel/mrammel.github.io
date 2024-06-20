@@ -7,12 +7,21 @@
 </head>
 <body>
     <div id="container">
-        <img id="test-image" src="https://drive.google.com/thumbnail?id=1nMxs6z0q-gOqesPk6vN2ocLjNPnJITEA" alt="Test Image" />
+        <img id="test-image" src="https://drive.google.com/uc?export=view&id=1nMxs6z0q-gOqesPk6vN2ocLjNPnJITEA" alt="Test Image" />
     </div>
     <script>
         const img = document.getElementById('test-image');
         img.onload = () => console.log('Image loaded successfully');
         img.onerror = (e) => console.error('Error loading image:', img.src, e);
+
+        // Additional error handling for asynchronous issues
+        window.addEventListener('error', (e) => {
+            console.error('Global error handler:', e.message, e.filename, e.lineno, e.colno, e.error);
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+        });
     </script>
 </body>
 </html>
