@@ -158,16 +158,11 @@
 
                 setInterval(() => {
                     const previousIndex = currentIndex;
-                    images[previousIndex].classList.remove('active');
-                    images[previousIndex].classList.add('previous');
-
                     currentIndex = (currentIndex + 1) % images.length;
-                    images[currentIndex].classList.add('active');
 
-                    setTimeout(() => {
-                        images[previousIndex].classList.remove('previous');
-                    }, 2000); // Remove previous class after fade out
-                }, 14000); // Change image every 14 seconds
+                    images[previousIndex].classList.remove('active');
+                    images[currentIndex].classList.add('active');
+                }, 10000); // Change image every 10 seconds
             }
         }
 
