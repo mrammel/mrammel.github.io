@@ -167,6 +167,12 @@
 
                     setTimeout(() => {
                         images[previousIndex].classList.remove('active', 'fadeout');
+                        if (currentIndex === 0) {
+                            images[currentIndex].style.transition = 'none';
+                            setTimeout(() => {
+                                images[currentIndex].style.transition = '';
+                            }, fadeDuration);
+                        }
                     }, fadeDuration);
                 };
 
