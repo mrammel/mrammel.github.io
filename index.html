@@ -5,98 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slideshow with Seamless Transition</title>
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: #000;
-        }
-        #outer-frame {
-            position: relative;
-            width: 1920px;
-            height: 1080px;
-            background-color: #131919;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        #inner-frame {
-            width: calc(1920px - 2 * 37px);
-            height: calc(1080px - 2 * 37px);
-            background-color: #ebe7dc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-        #container {
-            position: relative;
-            width: 1536px;
-            height: 864px;
-            background-color: #000;
-            background-size: cover;
-            background-position: center;
-        }
-        #slideshow {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-        #loading {
-            color: white;
-            font-size: 24px;
-            position: absolute;
-            z-index: 2;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
-        }
-        img.active {
-            opacity: 1;
-            z-index: 2;
-        }
-        img.fadeout {
-            opacity: 0 !important;
-            z-index: 2;
-            transition: opacity 2s ease-in-out;
-        }
-        #frame {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 3;
-        }
-        #shadow-frame {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 4;
-            box-shadow: inset 0 0 5px 5px rgba(0, 0, 0, 0.2),
-                        inset 0 0 5px 5px rgba(0, 0, 0, 0.15),
-                        inset 0 0 5px 5px rgba(0, 0, 0, 0.1),
-                        inset 0 0 5px 5px rgba(0, 0, 0, 0.05);
-        }
+        /* Dein CSS-Stil */
     </style>
 </head>
 <body>
@@ -131,7 +40,6 @@
                 slideshow.style.display = 'block';
                 slideshow.innerHTML = ''; // Clear existing images
 
-                let firstImageSrc = '';
                 data.files.forEach((file, index) => {
                     if (file.mimeType.startsWith('image/')) {
                         const img = document.createElement('img');
@@ -139,10 +47,6 @@
                         img.alt = file.name;
                         img.onload = () => {
                             console.log(`Image loaded: ${img.src}`);
-                            if (index === 0) {
-                                firstImageSrc = img.src;
-                                document.getElementById('container').style.backgroundImage = `url(${firstImageSrc})`;
-                            }
                         };
                         img.onerror = (e) => {
                             console.error('Error loading image:', img.src, e);
@@ -160,32 +64,27 @@
             }
         }
 
-        function fadeOutAndShowNext(images, currentIndex, nextIndex) {
-            images[currentIndex].classList.remove('active');
-            if (nextIndex === 0) {
-                images[currentIndex].classList.add('fadeout');
-                setTimeout(() => {
-                    images[currentIndex].classList.remove('fadeout');
-                    images[nextIndex].classList.add('active');
-                }, 2000); // 2 seconds for fade out duration
-            } else {
-                images[nextIndex].classList.add('active');
-            }
-        }
-
         function startSlideshow() {
             let currentIndex = 0;
             const images = document.querySelectorAll('#slideshow img');
+            const fadeDuration = 2000; // 2 seconds for fade out
             const displayDuration = 6000; // 6 seconds for display
 
             if (images.length > 0) {
                 images[currentIndex].classList.add('active');
 
-                setInterval(() => {
-                    const nextIndex = (currentIndex + 1) % images.length;
-                    fadeOutAndShowNext(images, currentIndex, nextIndex);
-                    currentIndex = nextIndex;
-                }, displayDuration + 2000); // Change image every 8 seconds including fade out duration
+                const fadeOutAndShowNext = () => {
+                    const previousIndex = currentIndex;
+                    currentIndex = (currentIndex + 1) % images.length;
+
+                    images[previousIndex].classList.add('fadeout');
+                    setTimeout(() => {
+                        images[previousIndex].classList.remove('active', 'fadeout');
+                        images[currentIndex].classList.add('active');
+                    }, fadeDuration);
+                };
+
+                setInterval(fadeOutAndShowNext, displayDuration + fadeDuration); // Change image every 8 seconds including fade out duration
             }
         }
 
