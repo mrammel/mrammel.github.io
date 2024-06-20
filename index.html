@@ -162,7 +162,15 @@
 
                     images[previousIndex].classList.remove('active');
                     images[currentIndex].classList.add('active');
-                }, 10000); // Change image every 10 seconds
+
+                    // Ensure the first image is behind the last image for a seamless transition
+                    if (currentIndex === 0) {
+                        images[previousIndex].style.transition = 'none';
+                        images[previousIndex].classList.remove('active');
+                        void images[previousIndex].offsetWidth; // trigger reflow
+                        images[previousIndex].style.transition = '';
+                    }
+                }, 12000); // Change image every 12 seconds
             }
         }
 
