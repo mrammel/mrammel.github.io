@@ -126,7 +126,7 @@
                 slideshow.style.display = 'block';
                 slideshow.innerHTML = '';
 
-                data.files.forEach(file => {
+                data.files.forEach((file, index) => {
                     if (file.mimeType.startsWith('image/')) {
                         const img = document.createElement('img');
                         img.src = file.thumbnailLink.replace(/=s220$/, '=s1536');
@@ -140,6 +140,10 @@
                     }
                 });
 
+                // Kopiere das erste Bild an das Ende der Slideshow
+                const firstImageClone = slideshow.firstChild.cloneNode(true);
+                slideshow.appendChild(firstImageClone);
+
                 startSlideshow();
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -151,8 +155,8 @@
             let currentIndex = 0;
             let nextIndex = 1;
             const images = document.querySelectorAll('#slideshow img');
-            const fadeDuration = 2000;
-            const displayDuration = 6000;
+            const fadeDuration = 2000; // 2 seconds for fade in/out
+            const displayDuration = 6000; // 6 seconds for display
 
             if (images.length > 0) {
                 images[currentIndex].classList.add('active');
@@ -167,11 +171,15 @@
 
                     setTimeout(() => {
                         images[previousIndex].classList.remove('active', 'fadeout');
-                        if (currentIndex === 0) {
-                            images[currentIndex].style.transition = 'none';
+
+                        // Wenn das nächste Bild das erste Bild ist (am Ende der Slideshow)
+                        if (currentIndex === images.length - 1) {
                             setTimeout(() => {
-                                images[currentIndex].style.transition = '';
-                            }, fadeDuration);
+                                images[currentIndex].classList.remove('active');
+                                currentIndex = 0;
+                                nextIndex = 1;
+                                images[currentIndex].classList.add('active');
+                            }, 1000); // Zeige das letzte Bild für 1 Sekunde
                         }
                     }, fadeDuration);
                 };
