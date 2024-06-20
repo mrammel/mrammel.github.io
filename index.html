@@ -111,35 +111,28 @@
         </div>
     </div>
     <script>
-        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--'; // Ersetzen Sie dies durch Ihre Google Drive Folder ID
-        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68'; // Ersetzen Sie dies durch Ihren Google Drive API Key
+        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--';
+        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68';
         const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink)`;
 
         async function fetchImages() {
             try {
-                console.log('Fetching images...');
                 const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
-                console.log('Images fetched:', data);
-
                 const slideshow = document.getElementById('slideshow');
                 const loading = document.getElementById('loading');
                 loading.style.display = 'none';
                 slideshow.style.display = 'block';
-                slideshow.innerHTML = ''; // Clear existing images
+                slideshow.innerHTML = '';
 
-                data.files.forEach((file, index) => {
+                data.files.forEach(file => {
                     if (file.mimeType.startsWith('image/')) {
                         const img = document.createElement('img');
-                        img.src = file.thumbnailLink.replace(/=s220$/, '=s1536'); // Scale thumbnail to appropriate size
+                        img.src = file.thumbnailLink.replace(/=s220$/, '=s1536');
                         img.alt = file.name;
-                        img.onload = () => {
-                            console.log(`Image loaded: ${img.src}`);
-                        };
-                        img.onerror = (e) => {
+                        img.onload = () => console.log(`Image loaded: ${img.src}`);
+                        img.onerror = e => {
                             console.error('Error loading image:', img.src, e);
                             img.remove();
                         };
@@ -150,8 +143,7 @@
                 startSlideshow();
             } catch (error) {
                 console.error('Error fetching data:', error);
-                const loading = document.getElementById('loading');
-                loading.innerHTML = 'Failed to load images.';
+                document.getElementById('loading').innerHTML = 'Failed to load images.';
             }
         }
 
@@ -159,8 +151,8 @@
             let currentIndex = 0;
             let nextIndex = 1;
             const images = document.querySelectorAll('#slideshow img');
-            const fadeDuration = 2000; // 2 seconds for fade in/out
-            const displayDuration = 6000; // 6 seconds for display
+            const fadeDuration = 2000;
+            const displayDuration = 6000;
 
             if (images.length > 0) {
                 images[currentIndex].classList.add('active');
@@ -170,41 +162,23 @@
                     currentIndex = nextIndex;
                     nextIndex = (nextIndex + 1) % images.length;
 
-                    if (currentIndex === 0) {
-                        images[previousIndex].classList.add('fadeout');
-                        images[currentIndex].classList.add('active');
+                    images[previousIndex].classList.add('fadeout');
+                    images[currentIndex].classList.add('active');
 
-                        setTimeout(() => {
-                            images[previousIndex].classList.remove('active', 'fadeout');
-                        }, fadeDuration);
-                    } else {
-                        images[previousIndex].classList.add('fadeout');
-                        images[currentIndex].classList.add('active');
-
-                        setTimeout(() => {
-                            images[previousIndex].classList.remove('active', 'fadeout');
-                        }, fadeDuration);
-                    }
+                    setTimeout(() => {
+                        images[previousIndex].classList.remove('active', 'fadeout');
+                    }, fadeDuration);
                 };
 
-                setInterval(fadeOutAndShowNext, displayDuration + fadeDuration); // Change image every 8 seconds including fade in/out duration
+                setInterval(fadeOutAndShowNext, displayDuration + fadeDuration);
             }
         }
 
-        // Initial load of images
         fetchImages();
+        setInterval(fetchImages, 60000);
 
-        // Refresh images every 60 seconds
-        setInterval(fetchImages, 60000); // Update images every 60 seconds
-
-        // Additional error handling for asynchronous issues
-        window.addEventListener('error', (e) => {
-            console.error('Global error handler:', e.message, e.filename, e.lineno, e.colno, e.error);
-        });
-
-        window.addEventListener('unhandledrejection', (e) => {
-            console.error('Unhandled promise rejection:', e.reason);
-        });
+        window.addEventListener('error', e => console.error('Global error handler:', e));
+        window.addEventListener('unhandledrejection', e => console.error('Unhandled promise rejection:', e.reason));
     </script>
 </body>
 </html>
