@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slideshow with Frame</title>
     <style>
@@ -88,7 +88,9 @@
                         if (file.name !== 'rahmen.png') { // Exclude 'rahmen.png' from slideshow
                             const img = document.createElement('img');
                             img.src = `https://drive.google.com/uc?export=view&id=${file.id}`;
-                            img.crossOrigin = 'anonymous';
+                            img.style.display = 'none'; // Initially hide the image
+                            img.onload = () => { img.style.display = 'block'; }; // Show image when loaded
+                            img.onerror = () => { console.error('Image not loaded'); };
                             slideshow.appendChild(img);
                         }
                     }
