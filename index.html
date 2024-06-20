@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slideshow with Double Frame and Shadow</title>
+    <title>Slideshow with Crossfade Transition</title>
     <style>
         body {
             display: flex;
@@ -17,15 +17,15 @@
             position: relative;
             width: 1920px;
             height: 1080px;
-            background-color: #131919; /* Äußerer Rahmen */
+            background-color: #131919;
             display: flex;
             justify-content: center;
             align-items: center;
         }
         #inner-frame {
-            width: calc(1920px - 2 * 37px); /* Berechnet die Breite des inneren Rahmens */
-            height: calc(1080px - 2 * 37px); /* Berechnet die Höhe des inneren Rahmens */
-            background-color: #ebe7dc; /* Innerer Rahmen */
+            width: calc(1920px - 2 * 37px);
+            height: calc(1080px - 2 * 37px);
+            background-color: #ebe7dc;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -35,7 +35,7 @@
             position: relative;
             width: 1536px;
             height: 864px;
-            background-color: #000; /* Hintergrundfarbe des Containers */
+            background-color: #000;
         }
         #slideshow {
             width: 100%;
@@ -44,7 +44,7 @@
             top: 0;
             left: 0;
             z-index: 1;
-            overflow: hidden; /* Hide any overflowing content */
+            overflow: hidden;
         }
         #loading {
             color: white;
@@ -58,7 +58,7 @@
         img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Ensures the image scales to fill the area */
+            object-fit: cover;
             position: absolute;
             top: 0;
             left: 0;
@@ -76,7 +76,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            pointer-events: none; /* Ensures the frame does not interfere with slideshow interaction */
+            pointer-events: none;
             z-index: 3;
         }
         #shadow-frame {
