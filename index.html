@@ -160,30 +160,32 @@
             }
         }
 
+        function fadeOutAndShowNext(images, currentIndex, nextIndex) {
+            images[currentIndex].classList.remove('active');
+            if (nextIndex === 0) {
+                images[currentIndex].classList.add('fadeout');
+                setTimeout(() => {
+                    images[currentIndex].classList.remove('fadeout');
+                    images[nextIndex].classList.add('active');
+                }, 2000); // 2 seconds for fade out duration
+            } else {
+                images[nextIndex].classList.add('active');
+            }
+        }
+
         function startSlideshow() {
             let currentIndex = 0;
             const images = document.querySelectorAll('#slideshow img');
-            const fadeDuration = 2000; // 2 seconds for fade out
             const displayDuration = 6000; // 6 seconds for display
 
             if (images.length > 0) {
                 images[currentIndex].classList.add('active');
 
                 setInterval(() => {
-                    const previousIndex = currentIndex;
-                    currentIndex = (currentIndex + 1) % images.length;
-
-                    if (currentIndex === 0) {
-                        images[previousIndex].classList.add('fadeout');
-                        setTimeout(() => {
-                            images[previousIndex].classList.remove('active', 'fadeout');
-                            images[currentIndex].classList.add('active');
-                        }, fadeDuration);
-                    } else {
-                        images[previousIndex].classList.remove('active');
-                        images[currentIndex].classList.add('active');
-                    }
-                }, displayDuration + fadeDuration); // Change image every 8 seconds including fade out duration
+                    const nextIndex = (currentIndex + 1) % images.length;
+                    fadeOutAndShowNext(images, currentIndex, nextIndex);
+                    currentIndex = nextIndex;
+                }, displayDuration + 2000); // Change image every 8 seconds including fade out duration
             }
         }
 
