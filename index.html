@@ -142,6 +142,7 @@
 
                 // Kopiere das erste Bild an das Ende der Slideshow
                 const firstImageClone = slideshow.firstChild.cloneNode(true);
+                firstImageClone.classList.add('clone');
                 slideshow.appendChild(firstImageClone);
 
                 startSlideshow();
@@ -153,18 +154,17 @@
 
         function startSlideshow() {
             let currentIndex = 0;
-            let nextIndex = 1;
             const images = document.querySelectorAll('#slideshow img');
             const fadeDuration = 2000; // 2 seconds for fade in/out
             const displayDuration = 6000; // 6 seconds for display
+            const clonedIndex = images.length - 1;
 
             if (images.length > 0) {
                 images[currentIndex].classList.add('active');
 
                 const fadeOutAndShowNext = () => {
                     const previousIndex = currentIndex;
-                    currentIndex = nextIndex;
-                    nextIndex = (nextIndex + 1) % images.length;
+                    currentIndex = (currentIndex + 1) % images.length;
 
                     images[previousIndex].classList.add('fadeout');
                     images[currentIndex].classList.add('active');
@@ -172,14 +172,13 @@
                     setTimeout(() => {
                         images[previousIndex].classList.remove('active', 'fadeout');
 
-                        // Wenn das nächste Bild das erste Bild ist (am Ende der Slideshow)
-                        if (currentIndex === images.length - 1) {
+                        // Wenn das nächste Bild das geklonte erste Bild ist (am Ende der Slideshow)
+                        if (currentIndex === clonedIndex) {
                             setTimeout(() => {
                                 images[currentIndex].classList.remove('active');
                                 currentIndex = 0;
-                                nextIndex = 1;
                                 images[currentIndex].classList.add('active');
-                            }, 1000); // Zeige das letzte Bild für 1 Sekunde
+                            }, 1000); // Zeige das geklonte Bild für 1 Sekunde
                         }
                     }, fadeDuration);
                 };
