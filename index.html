@@ -46,7 +46,6 @@
             top: 0;
             left: 0;
             z-index: 1;
-            overflow: hidden;
         }
         #loading {
             color: white;
@@ -74,6 +73,7 @@
         img.fadeout {
             opacity: 0 !important;
             z-index: 2;
+            transition: opacity 2s ease-in-out;
         }
         #frame {
             width: 100%;
@@ -164,6 +164,7 @@
             let currentIndex = 0;
             const images = document.querySelectorAll('#slideshow img');
             const fadeDuration = 2000; // 2 seconds for fade out
+            const displayDuration = 6000; // 6 seconds for display
 
             if (images.length > 0) {
                 images[currentIndex].classList.add('active');
@@ -172,17 +173,17 @@
                     const previousIndex = currentIndex;
                     currentIndex = (currentIndex + 1) % images.length;
 
-                    images[previousIndex].classList.remove('active');
-                    images[currentIndex].classList.add('active');
-
-                    // Sonderbehandlung für den Übergang vom letzten zum ersten Bild
                     if (currentIndex === 0) {
-                        images[images.length - 1].classList.add('fadeout');
+                        images[previousIndex].classList.add('fadeout');
                         setTimeout(() => {
-                            images[images.length - 1].classList.remove('fadeout');
-                        }, fadeDuration); // Nach der Übergangszeit entfernen
+                            images[previousIndex].classList.remove('active', 'fadeout');
+                            images[currentIndex].classList.add('active');
+                        }, fadeDuration);
+                    } else {
+                        images[previousIndex].classList.remove('active');
+                        images[currentIndex].classList.add('active');
                     }
-                }, 8000); // Change image every 8 seconds
+                }, displayDuration + fadeDuration); // Change image every 8 seconds including fade out duration
             }
         }
 
