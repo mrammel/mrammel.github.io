@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slideshow with Frame</title>
+    <title>Slideshow</title>
     <style>
         body {
             display: flex;
@@ -13,14 +13,10 @@
             margin: 0;
             background: #000;
         }
-        #container {
-            position: relative;
-            width: 1536px;
-            height: 864px;
-        }
         #slideshow {
-            width: 100%;
-            height: 100%;
+            width: 1536px; /* Set the width of the slideshow area */
+            height: 864px; /* Set the height of the slideshow area */
+            display: none;
             position: relative;
             overflow: hidden; /* Hide any overflowing content */
         }
@@ -43,22 +39,11 @@
             display: block;
             opacity: 1;
         }
-        #frame {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none; /* Ensures the frame does not interfere with slideshow interaction */
-        }
     </style>
 </head>
 <body>
     <div id="loading">Loading...</div>
-    <div id="container">
-        <div id="slideshow"></div>
-        <img id="frame" src="https://mrammel.github.io/rahmen.png" alt="Frame" onerror="console.error('Frame image not loaded');" />
-    </div>
+    <div id="slideshow"></div>
     <script>
         const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--';
         const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68';
