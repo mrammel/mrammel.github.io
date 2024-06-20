@@ -72,7 +72,7 @@
             z-index: 2;
         }
         img.fadeout {
-            opacity: 0;
+            opacity: 0 !important;
             z-index: 2;
         }
         #frame {
@@ -163,6 +163,8 @@
         function startSlideshow() {
             let currentIndex = 0;
             const images = document.querySelectorAll('#slideshow img');
+            const fadeDuration = 2000; // 2 seconds for fade out
+
             if (images.length > 0) {
                 images[currentIndex].classList.add('active');
 
@@ -178,7 +180,7 @@
                         images[images.length - 1].classList.add('fadeout');
                         setTimeout(() => {
                             images[images.length - 1].classList.remove('fadeout');
-                        }, 2000); // Nach der Übergangszeit entfernen
+                        }, fadeDuration); // Nach der Übergangszeit entfernen
                     }
                 }, 8000); // Change image every 8 seconds
             }
