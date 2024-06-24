@@ -76,9 +76,19 @@
             transition: opacity 2s ease-in-out;
         }
         #slideshow img {
-  opacity: 1 !important;
-  z-index: 10 !important;
-}
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        #slideshow img.active {
+            opacity: 1;
+            z-index: 2;
+        }
         #frame {
             width: 100%;
             height: 100%;
@@ -119,9 +129,48 @@
         const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68';
         const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink)`;
 
+        let currentIndex = 0;
+        const images = [];
+
+        function startSlideshow() {
+            if (images.length === 0) return;
+
+            setInterval(() => {
+                const currentImage = images[currentIndex];
+                currentImage.classList.remove('active');
+                currentImage.classList.add('fadeout');
+
+                currentIndex = (currentIndex + 1) % images.length;
+                const nextImage = images[currentIndex];
+                nextImage.classList.remove('fadeout');
+                nextImage.classList.add('active');
+
+                setTimeout(() => {
+                    currentImage.classList.remove('fadeout');
+                }, 2000);
+            }, 5000); // Change image every 5 seconds
+        }
+
+        function loadImage(file) {
+            return new Promise((resolve, reject) => {
+                const img = document.createElement('img');
+                img.src = `https://drive.google.com/uc?export=view&id=${file.id}`;
+                img.alt = file.name;
+                img.onload = () => {
+                    console.log(`Image loaded: ${img.src}`);
+                    slideshow.appendChild(img);
+                    images.push(img);
+                    resolve();
+                };
+                img.onerror = (e) => {
+                    console.error('Error loading image:', img.src, e);
+                    reject(e);
+                };
+            });
+        }
+
         async function fetchImages() {
             try {
-                console.log('Fetching images...');
                 const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -133,25 +182,17 @@
                 const loading = document.getElementById('loading');
                 loading.style.display = 'none';
                 slideshow.style.display = 'block';
-                slideshow.innerHTML = ''; // Clear existing images
 
-                data.files.forEach((file, index) => {
+                for (const file of data.files) {
                     if (file.mimeType.startsWith('image/')) {
-                        const img = document.createElement('img');
-                        img.src = file.thumbnailLink.replace(/=s220$/, '=s1536');
-                        img.alt = file.name;
-                        img.classList.add('slide');
-                        img.onload = () => {
-                            console.log(`Image loaded: ${img.src}`);
-                            slideshow.appendChild(img); // Add this line to append the image to the slideshow
-                        };
-                        img.onerror = (e) => {
-                            console.error('Error loading image:', img.src, e);
-                        };
+                        await loadImage(file);
                     }
-                });
+                }
 
-                startSlideshow();
+                if (images.length > 0) {
+                    images[0].classList.add('active');
+                    startSlideshow();
+                }
             } catch (error) {
                 console.error('Error fetching images:', error);
                 const loading = document.getElementById('loading');
@@ -159,27 +200,7 @@
             }
         }
 
-        function startSlideshow() {
-            let currentIndex = 0;
-            const images = document.querySelectorAll('#slideshow .slide');
-            const fadeDuration = 2000; // 2 seconds for fade in/out
-            const displayDuration = 6000; // 6 seconds for display
-
-            if (images.length > 0) {
-                images[currentIndex].classList.add('active');
-
-                const showNextImage = () => {
-                    images[currentIndex].classList.remove('active');
-                    currentIndex = (currentIndex + 1) % images.length;
-                    images[currentIndex].classList.add('active');
-                };
-
-                setInterval(showNextImage, displayDuration + fadeDuration); // Change image every 8 seconds including fade in/out duration
-            }
-        }
-
-        fetchImages();
-        setInterval(fetchImages, 60000); // Update images every 60 seconds
+        document.addEventListener('DOMContentLoaded', fetchImages);
 
         window.addEventListener('error', (e) => {
             console.error('Global error handler:', e.message, e.filename, e.lineno, e.colno, e.error);
