@@ -38,7 +38,6 @@
             background-color: #000;
             background-size: cover;
             background-position: center;
-            overflow: hidden;
         }
         #slideshow {
             width: 100%;
@@ -48,21 +47,33 @@
             left: 0;
             z-index: 1;
         }
-        .slide {
+        #loading {
+            color: white;
+            font-size: 24px;
+            position: absolute;
+            z-index: 2;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        img {
             width: 100%;
             height: 100%;
+            object-fit: cover;
             position: absolute;
             top: 0;
             left: 0;
             opacity: 0;
             transition: opacity 2s ease-in-out;
-            object-fit: cover;
         }
-        .active {
+        img.active {
             opacity: 1;
+            z-index: 2;
         }
-        .fadeout {
+        img.fadeout {
             opacity: 0 !important;
+            z-index: 1;
+            transition: opacity 2s ease-in-out;
         }
         #frame {
             width: 100%;
@@ -81,18 +92,10 @@
             height: 100%;
             pointer-events: none;
             z-index: 4;
-            background-image: url('rahmen.png');
-            background-size: cover;
-            box-shadow: inset 0 0 10px 10px rgba(0, 0, 0, 0.2);
-        }
-        #loading {
-            color: white;
-            font-size: 24px;
-            position: absolute;
-            z-index: 2;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            box-shadow: inset 0 0 5px 5px rgba(0, 0, 0, 0.2),
+                        inset 0 0 5px 5px rgba(0, 0, 0, 0.15),
+                        inset 0 0 5px 5px rgba(0, 0, 0, 0.1),
+                        inset 0 0 5px 5px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
@@ -101,90 +104,41 @@
         <div id="inner-frame">
             <div id="container">
                 <div id="slideshow"></div>
+                <img id="frame" src="rahmen.png" alt="Frame" />
                 <div id="loading">Loading...</div>
                 <div id="shadow-frame"></div>
             </div>
         </div>
     </div>
     <script>
-        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--';
-        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68';
+        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--'; // Ersetzen Sie dies durch Ihre Google Drive Folder ID
+        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68'; // Ersetzen Sie dies durch Ihren Google Drive API Key
         const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink)`;
 
         async function fetchImages() {
             try {
+                console.log('Fetching images...');
                 const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const data = await response.json();
+                console.log('Images fetched:', data);
+
                 const slideshow = document.getElementById('slideshow');
                 const loading = document.getElementById('loading');
                 loading.style.display = 'none';
                 slideshow.style.display = 'block';
-                slideshow.innerHTML = '';
+                slideshow.innerHTML = ''; // Clear existing images
 
-                const images = data.files.filter(file => file.mimeType.startsWith('image/'));
-
-                images.forEach((file, index) => {
-                    const img = document.createElement('img');
-                    img.src = `https://drive.google.com/uc?export=view&id=${file.id}`;
-                    img.alt = file.name;
-                    img.classList.add('slide');
-                    img.onload = () => console.log(`Image loaded: ${img.src}`);
-                    img.onerror = e => {
-                        console.error('Error loading image:', img.src, e);
-                        img.remove();
-                    };
-                    slideshow.appendChild(img);
-                });
-
-                // Kopiere das erste Bild an das Ende der Slideshow
-                const firstImageClone = slideshow.firstChild.cloneNode(true);
-                slideshow.appendChild(firstImageClone);
-
-                startSlideshow();
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                document.getElementById('loading').innerHTML = 'Failed to load images.';
-            }
-        }
-
-        function startSlideshow() {
-    let currentIndex = 0;
-    const images = document.querySelectorAll('#slideshow .slide');
-    const fadeDuration = 2000;
-    const displayDuration = 6000;
-    const totalDuration = displayDuration + fadeDuration;
-
-    if (images.length > 0) {
-        images[currentIndex].classList.add('active');
-
-        const fadeOutAndShowNext = () => {
-            const previousIndex = currentIndex;
-            currentIndex = (currentIndex + 1) % (images.length - 1);  // Exclude the cloned image
-
-            images[previousIndex].classList.add('fadeout');
-            images[currentIndex].classList.add('active');
-
-            setTimeout(() => {
-                images[previousIndex].classList.remove('active', 'fadeout');
-                if (currentIndex === 0) {
-                    // Instantly move the last image to the first position
-                    images[images.length - 1].classList.remove('active');
-                    images[0].classList.remove('fadeout');
-                }
-            }, fadeDuration);
-        };
-
-        setInterval(fadeOutAndShowNext, totalDuration);
-    }
-}
-        }
-
-        fetchImages();
-        setInterval(fetchImages, 60000);
-
-        window.addEventListener('error', e => console.error('Global error handler:', e));
-        window.addEventListener('unhandledrejection', e => console.error('Unhandled promise rejection:', e.reason));
-    </script>
-</body>
-</html>
+                data.files.forEach((file, index) => {
+                    if (file.mimeType.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = file.thumbnailLink.replace(/=s220$/, '=s1536'); // Scale thumbnail to appropriate size
+                        img.alt = file.name;
+                        img.onload = () => {
+                            console.log(`Image loaded: ${img.src}`);
+                        };
+                        img.onerror = (e) => {
+                            console.error('Error loading image:', img.src, e);
+                            img.remove();
