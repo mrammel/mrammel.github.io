@@ -81,10 +81,9 @@
             height: 100%;
             pointer-events: none;
             z-index: 4;
-            box-shadow: inset 0 0 5px 5px rgba(0, 0, 0, 0.2),
-                        inset 0 0 5px 5px rgba(0, 0, 0, 0.15),
-                        inset 0 0 5px 5px rgba(0, 0, 0, 0.1),
-                        inset 0 0 5px 5px rgba(0, 0, 0, 0.05);
+            background-image: url('rahmen.png');
+            background-size: cover;
+            box-shadow: inset 0 0 10px 10px rgba(0, 0, 0, 0.2);
         }
         #loading {
             color: white;
@@ -102,7 +101,6 @@
         <div id="inner-frame">
             <div id="container">
                 <div id="slideshow"></div>
-                <img id="frame" src="rahmen.png" alt="Frame" />
                 <div id="loading">Loading...</div>
                 <div id="shadow-frame"></div>
             </div>
@@ -128,7 +126,7 @@
 
                 images.forEach((file, index) => {
                     const img = document.createElement('img');
-                    img.src = file.thumbnailLink.replace(/=s220$/, '=s1536');
+                    img.src = `https://drive.google.com/uc?export=view&id=${file.id}`;
                     img.alt = file.name;
                     img.classList.add('slide');
                     img.onload = () => console.log(`Image loaded: ${img.src}`);
@@ -151,42 +149,35 @@
         }
 
         function startSlideshow() {
-            let currentIndex = 0;
-            const images = document.querySelectorAll('#slideshow .slide');
-            const fadeDuration = 2000; // 2 seconds for fade in/out
-            const displayDuration = 6000; // 6 seconds for display
-            const totalDuration = displayDuration + fadeDuration;
+    let currentIndex = 0;
+    const images = document.querySelectorAll('#slideshow .slide');
+    const fadeDuration = 2000;
+    const displayDuration = 6000;
+    const totalDuration = displayDuration + fadeDuration;
 
-            if (images.length > 0) {
-                images[currentIndex].classList.add('active');
+    if (images.length > 0) {
+        images[currentIndex].classList.add('active');
 
-                const fadeOutAndShowNext = () => {
-                    const previousIndex = currentIndex;
-                    currentIndex = (currentIndex + 1) % images.length;
+        const fadeOutAndShowNext = () => {
+            const previousIndex = currentIndex;
+            currentIndex = (currentIndex + 1) % (images.length - 1);  // Exclude the cloned image
 
-                    if (currentIndex === 0) {
-                        images[previousIndex].classList.add('fadeout');
-                        images[0].classList.add('active');
-                        setTimeout(() => {
-                            images[previousIndex].classList.remove('fadeout');
-                            currentIndex = 0;
-                            images.forEach((img, index) => {
-                                if (index !== 0) {
-                                    img.classList.remove('active');
-                                }
-                            });
-                        }, fadeDuration);
-                    } else {
-                        images[previousIndex].classList.add('fadeout');
-                        images[currentIndex].classList.add('active');
-                        setTimeout(() => {
-                            images[previousIndex].classList.remove('active', 'fadeout');
-                        }, fadeDuration);
-                    }
-                };
+            images[previousIndex].classList.add('fadeout');
+            images[currentIndex].classList.add('active');
 
-                setInterval(fadeOutAndShowNext, totalDuration);
-            }
+            setTimeout(() => {
+                images[previousIndex].classList.remove('active', 'fadeout');
+                if (currentIndex === 0) {
+                    // Instantly move the last image to the first position
+                    images[images.length - 1].classList.remove('active');
+                    images[0].classList.remove('fadeout');
+                }
+            }, fadeDuration);
+        };
+
+        setInterval(fadeOutAndShowNext, totalDuration);
+    }
+}
         }
 
         fetchImages();
