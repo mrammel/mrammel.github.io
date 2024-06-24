@@ -111,8 +111,8 @@
         </div>
     </div>
     <script>
-        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--'; // Ersetzen Sie dies durch Ihre Google Drive Folder ID
-        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68'; // Ersetzen Sie dies durch Ihren Google Drive API Key
+        const folderId = '17t-Qk9aTI2A5hwNEKp_y8mv5WUuENY--';
+        const apiKey = 'AIzaSyC8EjkrlWKpP_IJWiXC-an6i7u53Eh3a68';
         const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink)`;
 
         async function fetchImages() {
@@ -134,11 +134,56 @@
                 data.files.forEach((file, index) => {
                     if (file.mimeType.startsWith('image/')) {
                         const img = document.createElement('img');
-                        img.src = file.thumbnailLink.replace(/=s220$/, '=s1536'); // Scale thumbnail to appropriate size
+                        img.src = file.thumbnailLink.replace(/=s220$/, '=s1536');
                         img.alt = file.name;
+                        img.classList.add('slide');
                         img.onload = () => {
                             console.log(`Image loaded: ${img.src}`);
+                            slideshow.appendChild(img); // Add this line to append the image to the slideshow
                         };
                         img.onerror = (e) => {
                             console.error('Error loading image:', img.src, e);
-                            img.remove();
+                        };
+                    }
+                });
+
+                startSlideshow();
+            } catch (error) {
+                console.error('Error fetching images:', error);
+                const loading = document.getElementById('loading');
+                loading.textContent = 'Error loading images. Please check the console.';
+            }
+        }
+
+        function startSlideshow() {
+            let currentIndex = 0;
+            const images = document.querySelectorAll('#slideshow .slide');
+            const fadeDuration = 2000; // 2 seconds for fade in/out
+            const displayDuration = 6000; // 6 seconds for display
+
+            if (images.length > 0) {
+                images[currentIndex].classList.add('active');
+
+                const showNextImage = () => {
+                    images[currentIndex].classList.remove('active');
+                    currentIndex = (currentIndex + 1) % images.length;
+                    images[currentIndex].classList.add('active');
+                };
+
+                setInterval(showNextImage, displayDuration + fadeDuration); // Change image every 8 seconds including fade in/out duration
+            }
+        }
+
+        fetchImages();
+        setInterval(fetchImages, 60000); // Update images every 60 seconds
+
+        window.addEventListener('error', (e) => {
+            console.error('Global error handler:', e.message, e.filename, e.lineno, e.colno, e.error);
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('Unhandled promise rejection:', e.reason);
+        });
+    </script>
+</body>
+</html>
