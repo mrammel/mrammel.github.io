@@ -156,7 +156,7 @@
             const images = document.querySelectorAll('#slideshow .slide');
             const fadeDuration = 2000; // 2 seconds for fade in/out
             const displayDuration = 6000; // 6 seconds for display
-            const clonedIndex = images.length - 1;
+            const totalDuration = displayDuration + fadeDuration;
 
             if (images.length > 0) {
                 images[currentIndex].classList.add('active');
@@ -165,24 +165,28 @@
                     const previousIndex = currentIndex;
                     currentIndex = (currentIndex + 1) % images.length;
 
-                    images[previousIndex].classList.add('fadeout');
-                    images[currentIndex].classList.add('active');
-
-                    setTimeout(() => {
-                        images[previousIndex].classList.remove('active', 'fadeout');
-
-                        // Wenn das nächste Bild das geklonte erste Bild ist (am Ende der Slideshow)
-                        if (currentIndex === clonedIndex) {
-                            setTimeout(() => {
-                                images[currentIndex].classList.remove('active');
-                                currentIndex = 0;
-                                images[currentIndex].classList.add('active');
-                            }, displayDuration - fadeDuration); // Zeige das geklonte Bild für die Dauer der Anzeige
-                        }
-                    }, fadeDuration);
+                    if (currentIndex === 0) {
+                        images[previousIndex].classList.add('fadeout');
+                        images[0].classList.add('active');
+                        setTimeout(() => {
+                            images[previousIndex].classList.remove('fadeout');
+                            currentIndex = 0;
+                            images.forEach((img, index) => {
+                                if (index !== 0) {
+                                    img.classList.remove('active');
+                                }
+                            });
+                        }, fadeDuration);
+                    } else {
+                        images[previousIndex].classList.add('fadeout');
+                        images[currentIndex].classList.add('active');
+                        setTimeout(() => {
+                            images[previousIndex].classList.remove('active', 'fadeout');
+                        }, fadeDuration);
+                    }
                 };
 
-                setInterval(fadeOutAndShowNext, displayDuration + fadeDuration);
+                setInterval(fadeOutAndShowNext, totalDuration);
             }
         }
 
